@@ -1,0 +1,10 @@
+  for(var y = 0; y < tile.tilesX; y++){
+    for(var x = 0; x < tile.tilesY; x++){
+      ctx.fillStyle = tile.color
+      ctx.fillRect(centerX - x * tile.width + centerMap, centerY - y * tile.height + 1 + centerMap, tile.width, tile.height)
+      ctx.strokeStyle = 'green'
+      ctx.lineWidth = 1
+      ctx.rect(centerX - x * tile.width + + centerMap, centerY - y * tile.height + 1 + centerMap, tile.width, tile.height)
+      ctx.stroke();
+    }
+  }
