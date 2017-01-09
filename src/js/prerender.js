@@ -1,11 +1,11 @@
 /**
  * Created by towek on 1/6/2017.
  */
+var enemyBlock = []
 function drawOnce(){
   //Map
   prerender.fillStyle = tile.color
   prerender.fillRect(tile.x, tile.y, tile.width * tile.tilesX, tile.height * tile.tilesY)
-
   //Map grid
   generateMap()
 }
@@ -20,4 +20,14 @@ function generateMap(){
       prerender.stroke()
     }
   }
+}
+
+function createEnemys(amount){
+  var e = []
+  for(var i = 0; i < amount; i++){
+    e[i] = new enemy()
+    e[i].name += i
+    e[i].y = centerY - (tile.height * tile.tilesY) * 0.5 + i * tile.height + (player.height - enemyST.height) * 0.5
+  }
+  return e
 }

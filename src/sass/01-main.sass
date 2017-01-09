@@ -7,13 +7,38 @@ body
   background-color: black
   overflow: hidden
 
+#canvas
+  position: relative
+
 canvas
   border: 1px solid red
+
 #game
   position: absolute
   top: 0
 
-#debug
+#trigger
   position: absolute
   top: 0
   z-index: -1
+
+#debug
+  position: absolute
+  top: 0
+  z-index: -99
+
+#control
+  margin-top: 2px
+  width: 100%
+  audio
+    width: 100%
+  input
+    margin-top: -5px
+    width: 100%
+    border: none
+    height: 32px
+    text-align: center
+    background-color: black
+    border-bottom: solid white 1px
+    color: white
+    outline-color: aqua

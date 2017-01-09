@@ -2,25 +2,30 @@ var canvasWidth = 1024
 var canvasHeight = 720
 var centerX = canvasWidth / 2
 var centerY = canvasHeight / 2
-var FPS = 30
+var FPS = 60
 var ctx = ""
 var canvas = ""
 var once
 var prerender
 var pointPos = new Object()
-
+var ontrigger
+var trigger
+var canvasDiv
 
 player.x = centerX - player.height / 2
 player.y = centerY - player.width / 2
 window.onload = function () {
-
+  canvasDiv = document.getElementById("canvas")
   canvas = document.getElementsByClassName("ctx")[0]
   once = document.getElementsByClassName("ctx")[1]
-  console.log(once)
+  ontrigger = document.getElementsByClassName("ctx")[2]
   ctx = canvas.getContext("2d")
   prerender = once.getContext("2d")
-  canvas.width = once.width = canvasWidth
-  canvas.height = once.height = canvasHeight
+  trigger = ontrigger.getContext("2d")
+  canvas.width = once.width = ontrigger.width = canvasWidth
+  canvas.height = once.height = ontrigger.height = canvasHeight
+  canvasDiv.style.width = canvasWidth + "px"
+  canvasDiv.style.height = canvasHeight + "px"
 
   //setting vars
   pointPos = RandomPos()
@@ -30,24 +35,34 @@ window.onload = function () {
   tile.x = centerX - (tile.width * tile.tilesX) * 0.5
   tile.y = centerY - (tile.height * tile.tilesY) * 0.5
 
-  move()
+  enemy.y = centerY - enemy.height/2
 
+  //init main functions
+  move()
+  soundcloud()
   // Game loop
   setInterval(function(){
     update()
     draw()
+    if(!moveH.keyup || pointPicker(player, point)){
+      triggerDraw()
+    }
   }, 1000/FPS)
+  if(!moveH.keyup || pointPicker(player, point)){
+    triggerDraw()
+  }
   drawOnce()
+  triggerDraw()
 }
 
 /// Other functions
 //move
 //var posFixer = tile.width * 1.5 - (tile.width - player.width) * 0.125
 var moveBlocker = {
-  up: centerY - tile.height * 2 - player.height * 0.5,
-  right: centerX + tile.width * 2 - player.width * 0.5,
-  down: centerY + tile.height * 2 - player.height * 0.5,
-  left: centerX - tile.width * 2 - player.width * 0.5
+  up: centerY - tile.height * Math.floor(tile.tilesY * 0.5) - player.height * 0.5,
+  right: centerX + tile.width * Math.floor(tile.tilesX * 0.5) - player.width * 0.5,
+  down: centerY + tile.height * Math.floor(tile.tilesY * 0.5) - player.height * 0.5,
+  left: centerX - tile.width * Math.floor(tile.tilesX * 0.5) - player.width * 0.5
 }
 
 function move(){
@@ -74,7 +89,6 @@ function move(){
       player.y += moveH.y * tile.height
       moveH.keyup = false
     }
-    //console.log(move.x+" x "+move.y)
   })
 
   window.addEventListener("keyup", function (e){
@@ -89,17 +103,19 @@ function RandomPos(){
   var randomY = Math.floor((Math.random() * tile.tilesY))
   var x = centerX - centerMap + ( tile.width - point.width ) * 0.5 + randomX * tile.width - tile.width
   var y = centerY - centerMap + ( tile.height - point.height ) * 0.5 + randomY * tile.height - tile.height
-  console.log("x " + randomX)
-  console.log("y " + randomY)
   return {
     x: x,
     y: y
   }
 }
 
-function coinPicker(a, b){
+function pointPicker(a, b){
   if(a.x == b.x && a.y == b.y){
-    console.log(a + " picking " + b)
+    var randomPos = RandomPos()
+    point.x = randomPos.x
+    point.y = randomPos.y
+    console.log("Coin picked")
+    points++
     return true
   }
   return false

@@ -53,7 +53,7 @@ gulp.task('sass', function () {
 })
 
 gulp.task('js', function () {
-  return gulp.src(['./src/js/objects.js', './src/js/game.js', './src/js/prerender.js', './src/js/index.js'])
+  return gulp.src(['./src/js/objects.js', './src/js/game.js', './src/js/trigger.js', './src/js/prerender.js', './src/js/soundcloud.js','./src/js/index.js'])
     .pipe(concat('bundle.js'))
     .pipe(gulp.dest('./public/assets/js'))
 })
