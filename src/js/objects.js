@@ -33,7 +33,8 @@ var enemyST = {
   x: 0,
   y: 0,
 }
-enemyST.x = (enemyST.width * -2)
+//enemyST.x = (enemyST.width * -2)
+
 function enemy(){
   this.name = "enemy-"
   this.width = enemyST.width
