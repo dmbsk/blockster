@@ -57,14 +57,16 @@ function update(){
 var filterStrength = 20;
 var frameTime = 0, lastLoop = new Date, thisLoop;
 var speed = 5
-var MainDifficulty = 50
+var MainDifficulty = 5
 var difficultyFilter = Math.floor( 180 / tile.tilesX)
 var respawnEnemy = -1
 var enemyNumber = 0
-var j = 0
 var firstEnemy = true
 var deleter = 0
-var tester2 = 0
+var difficulty = []
+var timeStart = 0
+var timeEnd = 0
+var spawnDelay = player.width*speed
 function draw(){
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   var thisFrameTime = (thisLoop=new Date) - lastLoop;
@@ -75,41 +77,42 @@ function draw(){
 
   ctx.fillStyle = "white"
   ctx.fillText((1000/frameTime).toFixed(1) + " fps", 12, 20)
-
-
-  var start = difficultyFilter * j
-  var end = difficultyFilter * (j + 1)
-  var avg = calculateAvg( start, end, true)
-  
-  if(avg > difficulty){
+  for(var j = 0; j < tile.tilesY; j++){
+    var start = difficultyFilter * j
+    var end = difficultyFilter * (j + 1)
+    var avg = calculateAvg( start, end, true)
+    if(avg > difficulty[j] && timeEnd - timeStart >= spawnDelay){
       enemyBlock[enemyNumber] = createEnemy(j, enemyNumber)
       j++
       enemyNumber++
       firstEnemy = false
-      //console.log(enemyBlock.length)
+      timeStart = Date.now()
+    }
+    if( j > tile.tilesY - 1){
+      j = 0
+    }
   }
-  if( j > tile.tilesY - 1){
-    j = 0
-  }
+  timeEnd = Date.now()
   for(var i = deleter; i < enemyBlock.length; i++){
     //posCreator++
     //draw enemy
     ctx.fillStyle = enemyST.color
     ctx.fillRect(enemyBlock[i].x, enemyBlock[i].y, enemyST.width, enemyST.height)
     enemyBlock[i].x += speed
-    tester2 = 0
-    //console.log(i)
+    if( enemyBlock[i].x >= player.x &&
+        enemyBlock[i].x + enemyST.width <= player.x + player.width &&
+        enemyBlock[i].y >= player.y &&
+        enemyBlock[i].y + enemyST.height <= player.y + player.height
+      ){
+      location.reload()
+      //points = 0
+      //player.x
+      //triggerDraw()
+    }
     if(enemyBlock[i].x > canvasWidth + enemyST.width * 1.1) {
       deleter = enemyBlock[i].id + 1
-      //console.log(enemyBlock[i].id)
-      //enemyBlock.splice(i, 1)
     }
   }
-  //console.log(enemyBlock.length)
-  //debug
-  //ctx.fillStyle = "green"
-  //ctx.font = "40px"
-  //ctx.fillText(Math.floor(avg) + "        from " + start + "  to  " + end, 12, enemyBlock[j].y)
 }
 function createEnemy(i, id){
   var e
@@ -118,6 +121,9 @@ function createEnemy(i, id){
   e.id = id
   e.y = centerY - (tile.height * tile.tilesY) * 0.5 + i * tile.height + (tile.height - enemyST.height) * 0.5
   return e
+}
+function collision(a, b){
+
 }
 /**
  * Created by towek on 1/6/2017.
@@ -144,6 +150,27 @@ function triggerDraw(){
   trigger.fillStyle = point.color
   trigger.fillText("Point pos: " + point.x + " x " + point.y, 12, 60)
 }
+
+function pointPicker(a, b){
+  if(a.x == b.x && a.y == b.y){
+    var randomPos = RandomPos()
+    point.x = randomPos.x
+    point.y = randomPos.y
+    console.log("Coin picked")
+    if(points == 0){
+      speed = 5
+      spawnDelay = player.width*speed
+    }else{
+      speed += 0.5
+      spawnDelay -= 5
+    }
+    points++
+
+
+    return true
+  }
+  return false
+}
 /**
  * Created by towek on 1/6/2017.
  */
@@ -154,6 +181,10 @@ function drawOnce(){
   prerender.fillRect(tile.x, tile.y, tile.width * tile.tilesX, tile.height * tile.tilesY)
   //Map grid
   generateMap()
+  for(var i = 0; i < tile.tilesY; i++){
+    difficulty[i] = 255 -  (i + 1) * 23
+    console.log(difficulty[i])
+  }
 }
 
 
@@ -193,7 +224,7 @@ var canvas
 var volumeFix = 1
 
 function soundcloud() {
-  track_url = "https://soundcloud.com/solacerecords/wolfe-love-like-that-again"
+  track_url = "https://soundcloud.com/iglooghost/ell-ft-rocks-foe"
   input = document.getElementById("input")
   input.value = track_url
 
@@ -279,8 +310,8 @@ function SCmain(){
   audio.play()
 }
 
-var canvasWidth = 1024
-var canvasHeight = 720
+var canvasWidth = window.innerWidth
+var canvasHeight = window.innerHeight
 var centerX = canvasWidth / 2
 var centerY = canvasHeight / 2
 var FPS = 60
@@ -388,16 +419,4 @@ function RandomPos(){
     x: x,
     y: y
   }
-}
-
-function pointPicker(a, b){
-  if(a.x == b.x && a.y == b.y){
-    var randomPos = RandomPos()
-    point.x = randomPos.x
-    point.y = randomPos.y
-    console.log("Coin picked")
-    points++
-    return true
-  }
-  return false
 }

@@ -8,6 +8,10 @@ function drawOnce(){
   prerender.fillRect(tile.x, tile.y, tile.width * tile.tilesX, tile.height * tile.tilesY)
   //Map grid
   generateMap()
+  for(var i = 0; i < tile.tilesY; i++){
+    difficulty[i] = 255 -  (i + 1) * 23
+    console.log(difficulty[i])
+  }
 }
 
 

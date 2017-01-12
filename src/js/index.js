@@ -1,5 +1,5 @@
-var canvasWidth = 1024
-var canvasHeight = 720
+var canvasWidth = window.innerWidth
+var canvasHeight = window.innerHeight
 var centerX = canvasWidth / 2
 var centerY = canvasHeight / 2
 var FPS = 60
@@ -107,16 +107,4 @@ function RandomPos(){
     x: x,
     y: y
   }
-}
-
-function pointPicker(a, b){
-  if(a.x == b.x && a.y == b.y){
-    var randomPos = RandomPos()
-    point.x = randomPos.x
-    point.y = randomPos.y
-    console.log("Coin picked")
-    points++
-    return true
-  }
-  return false
 }

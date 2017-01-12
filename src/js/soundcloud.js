@@ -13,7 +13,7 @@ var canvas
 var volumeFix = 1
 
 function soundcloud() {
-  track_url = "https://soundcloud.com/solacerecords/wolfe-love-like-that-again"
+  track_url = "https://soundcloud.com/iglooghost/ell-ft-rocks-foe"
   input = document.getElementById("input")
   input.value = track_url
 

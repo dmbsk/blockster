@@ -23,3 +23,24 @@ function triggerDraw(){
   trigger.fillStyle = point.color
   trigger.fillText("Point pos: " + point.x + " x " + point.y, 12, 60)
 }
+
+function pointPicker(a, b){
+  if(a.x == b.x && a.y == b.y){
+    var randomPos = RandomPos()
+    point.x = randomPos.x
+    point.y = randomPos.y
+    console.log("Coin picked")
+    if(points == 0){
+      speed = 5
+      spawnDelay = player.width*speed
+    }else{
+      speed += 0.5
+      spawnDelay -= 5
+    }
+    points++
+
+
+    return true
+  }
+  return false
+}
