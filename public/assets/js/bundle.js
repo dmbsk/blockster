@@ -36,7 +36,6 @@ var enemyST = {
 //enemyST.x = (enemyST.width * -2)
 
 function enemy(){
-  this.name = "enemy-"
   this.width = enemyST.width
   this.height = enemyST.height
   this.x = enemyST.x
@@ -49,6 +48,18 @@ var moveH = {
   keyup: true
 }
 
+var difficultyHard = {
+    speed: 0.1,
+    spawn: 2000
+  }
+var difficultyMedium = {
+    speed: 0.075,
+    spawn: 2500
+  }
+var difficultyEasy = {
+    speed: 0.015,
+    spawn: 3000
+  }
 
 function update(){
 
@@ -56,43 +67,55 @@ function update(){
 
 var filterStrength = 20;
 var frameTime = 0, lastLoop = new Date, thisLoop;
-var speed = 5
-var MainDifficulty = 5
-var difficultyFilter = Math.floor( 180 / tile.tilesX)
-var respawnEnemy = -1
+var speed = 0
+var MainDifficulty = 10
+var maxFrequency = 150
+var difficultyFilter = Math.floor( maxFrequency / tile.tilesX)
 var enemyNumber = 0
-var firstEnemy = true
 var deleter = 0
 var difficulty = []
-var timeStart = 0
-var timeEnd = 0
-var spawnDelay = player.width*speed
+var spawnDelay = 500
+var spawnDelayMain
 function draw(){
+  speed = calculateAvg(0, 255, true) * difficultyMedium.speed
+  spawnDelayMain = difficultyMedium.spawn - calculateAvg(0, 255, true) * 0.5
+
+  spawnDelay = (500 * tile.tilesY) - (calculateAvg(0, 255, true) * (tile.tilesY * MainDifficulty))
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   var thisFrameTime = (thisLoop=new Date) - lastLoop;
   frameTime+= (thisFrameTime - frameTime) / filterStrength;
   lastLoop = thisLoop;
 
   //Debug info
-
+  ctx.font = "12px Lato"
   ctx.fillStyle = "white"
   ctx.fillText((1000/frameTime).toFixed(1) + " fps", 12, 20)
-  for(var j = 0; j < tile.tilesY; j++){
-    var start = difficultyFilter * j
-    var end = difficultyFilter * (j + 1)
-    var avg = calculateAvg( start, end, true)
-    if(avg > difficulty[j] && timeEnd - timeStart >= spawnDelay){
-      enemyBlock[enemyNumber] = createEnemy(j, enemyNumber)
-      j++
-      enemyNumber++
-      firstEnemy = false
-      timeStart = Date.now()
+
+  for(var i = 0; i < tile.tilesY; i++) {
+    var start = 24 + (difficultyFilter * i)
+    var end = 24 + (difficultyFilter * (i + 1))
+    var avg = calculateAvg(start, end, true) / i
+    if (avg > difficulty[i] && timeEnd[i] - timeStart[i] >= spawnDelayMain) {
+      if (audio.currentTime > 10) {
+        enemyBlock[enemyNumber] = createEnemy(i, enemyNumber)
+        enemyNumber++
+      }
+      timeStart[i] = Date.now()
     }
-    if( j > tile.tilesY - 1){
-      j = 0
+    if (i <= tile.tilesY - 1) { //wall destroyer
+      if (timeStart[i - 1] + timeStart[i + 1] > timeStart[i] * 1.99 && timeStart[i - 1] + timeStart[i + 1] < timeStart[i] * 2) {
+        timeStart[i] += 5
+      }
     }
+
+    ctx.fillStyle = "green"
+    ctx.font = "12px Lato"
+    ctx.fillText(Math.floor(avg) + "        from " + start + "  to  " + end, 12, centerY - (tile.height * tile.tilesY) * 0.5 + i * tile.height + (tile.height - enemyST.height) * 0.5)
+    timeEnd[i] = Date.now()
   }
-  timeEnd = Date.now()
+  ctx.font = "40px Lato"
+  ctx.fillText(Math.floor(spawnDelayMain), 12, 700)
+
   for(var i = deleter; i < enemyBlock.length; i++){
     //posCreator++
     //draw enemy
@@ -104,10 +127,10 @@ function draw(){
         enemyBlock[i].y >= player.y &&
         enemyBlock[i].y + enemyST.height <= player.y + player.height
       ){
-      location.reload()
-      //points = 0
+      //location.reload()
+      points = 0
       //player.x
-      //triggerDraw()
+      triggerDraw()
     }
     if(enemyBlock[i].x > canvasWidth + enemyST.width * 1.1) {
       deleter = enemyBlock[i].id + 1
@@ -117,7 +140,6 @@ function draw(){
 function createEnemy(i, id){
   var e
   e = new enemy()
-  e.name += i
   e.id = id
   e.y = centerY - (tile.height * tile.tilesY) * 0.5 + i * tile.height + (tile.height - enemyST.height) * 0.5
   return e
@@ -180,18 +202,20 @@ function drawOnce(){
   prerender.fillStyle = tile.color
   prerender.fillRect(tile.x, tile.y, tile.width * tile.tilesX, tile.height * tile.tilesY)
   //Map grid
+  prerender.scale(0.5, 0.5)
   generateMap()
+
   for(var i = 0; i < tile.tilesY; i++){
-    difficulty[i] = 255 -  (i + 1) * 23
+    difficulty[i] = maxFrequency / (i + 1)
     console.log(difficulty[i])
   }
 }
 
 
 function generateMap(){
-  for(var y = 0; y < tile.tilesX; y++){
-    for(var x = 0; x < tile.tilesY; x++){
-      prerender.rect(centerX - x * tile.width + centerMap, centerY - y * tile.height + centerMap, tile.width, tile.height)
+  for(var x = 0; x < tile.tilesX; x++){
+    for(var y = 0; y < tile.tilesY; y++){
+      prerender.rect((centerX - x * tile.width + centerMap) * 2, (centerY - y * tile.height + centerMap) * 2, tile.width * 2, tile.height * 2)
       prerender.strokeStyle = 'green'
       prerender.lineWidth = 1
       prerender.stroke()
@@ -224,14 +248,14 @@ var canvas
 var volumeFix = 1
 
 function soundcloud() {
-  track_url = "https://soundcloud.com/iglooghost/ell-ft-rocks-foe"
+  track_url = "https://soundcloud.com/future/elenne-bonana"
   input = document.getElementById("input")
   input.value = track_url
 
   //var divsAmount = 200
   audio = document.getElementById("audio")
   audio.crossOrigin = "anonymous"
-
+  audio.src = track_url
   //generateDivs(divsAmount)
   SCmain()
 
@@ -310,8 +334,8 @@ function SCmain(){
   audio.play()
 }
 
-var canvasWidth = window.innerWidth
-var canvasHeight = window.innerHeight
+var canvasWidth = 1024
+var canvasHeight = 720
 var centerX = canvasWidth / 2
 var centerY = canvasHeight / 2
 var FPS = 60
@@ -323,6 +347,8 @@ var pointPos = new Object()
 var ontrigger
 var trigger
 var canvasDiv
+var timeStart = []
+var timeEnd = []
 
 player.x = centerX - player.height / 2
 player.y = centerY - player.width / 2
@@ -349,6 +375,9 @@ window.onload = function () {
 
   enemy.y = centerY - enemy.height/2
 
+  for(var i = 0; i < tile.tilesY; i++){
+    timeStart[i] = Date.now()
+  }
   //init main functions
   move()
   soundcloud()
@@ -419,4 +448,27 @@ function RandomPos(){
     x: x,
     y: y
   }
+}
+
+function moveTest(){
+  window.addEventListener("keydown", function (e) {
+      var code = e.keyCode
+
+      if (code == 38 && player.y > moveBlocker.up) { // up
+        player.y += -1 * 3
+      }
+
+      if (code == 40 && player.y < moveBlocker.down) { // down
+        player.y += 1 * 3
+      }
+
+      if (code == 37 && player.x > moveBlocker.left) { // left
+        player.x += -1 * 3
+      }
+
+      if (code == 39 && player.x < moveBlocker.right) { // right
+        player.x += 1 * 3
+      }
+
+  })
 }

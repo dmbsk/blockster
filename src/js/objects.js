@@ -36,7 +36,6 @@ var enemyST = {
 //enemyST.x = (enemyST.width * -2)
 
 function enemy(){
-  this.name = "enemy-"
   this.width = enemyST.width
   this.height = enemyST.height
   this.x = enemyST.x
@@ -48,3 +47,16 @@ var moveH = {
   y: 0,
   keyup: true
 }
+
+var difficultyHard = {
+    speed: 0.1,
+    spawn: 2000
+  }
+var difficultyMedium = {
+    speed: 0.075,
+    spawn: 2500
+  }
+var difficultyEasy = {
+    speed: 0.015,
+    spawn: 3000
+  }

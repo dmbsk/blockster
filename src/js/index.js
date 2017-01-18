@@ -1,5 +1,5 @@
-var canvasWidth = window.innerWidth
-var canvasHeight = window.innerHeight
+var canvasWidth = 1024
+var canvasHeight = 720
 var centerX = canvasWidth / 2
 var centerY = canvasHeight / 2
 var FPS = 60
@@ -11,6 +11,8 @@ var pointPos = new Object()
 var ontrigger
 var trigger
 var canvasDiv
+var timeStart = []
+var timeEnd = []
 
 player.x = centerX - player.height / 2
 player.y = centerY - player.width / 2
@@ -37,6 +39,9 @@ window.onload = function () {
 
   enemy.y = centerY - enemy.height/2
 
+  for(var i = 0; i < tile.tilesY; i++){
+    timeStart[i] = Date.now()
+  }
   //init main functions
   move()
   soundcloud()
@@ -107,4 +112,27 @@ function RandomPos(){
     x: x,
     y: y
   }
+}
+
+function moveTest(){
+  window.addEventListener("keydown", function (e) {
+      var code = e.keyCode
+
+      if (code == 38 && player.y > moveBlocker.up) { // up
+        player.y += -1 * 3
+      }
+
+      if (code == 40 && player.y < moveBlocker.down) { // down
+        player.y += 1 * 3
+      }
+
+      if (code == 37 && player.x > moveBlocker.left) { // left
+        player.x += -1 * 3
+      }
+
+      if (code == 39 && player.x < moveBlocker.right) { // right
+        player.x += 1 * 3
+      }
+
+  })
 }

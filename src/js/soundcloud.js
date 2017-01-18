@@ -13,14 +13,14 @@ var canvas
 var volumeFix = 1
 
 function soundcloud() {
-  track_url = "https://soundcloud.com/iglooghost/ell-ft-rocks-foe"
+  track_url = "https://soundcloud.com/future/elenne-bonana"
   input = document.getElementById("input")
   input.value = track_url
 
   //var divsAmount = 200
   audio = document.getElementById("audio")
   audio.crossOrigin = "anonymous"
-
+  audio.src = track_url
   //generateDivs(divsAmount)
   SCmain()
 
